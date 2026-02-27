@@ -1,0 +1,40 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Local configuration
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output.json
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Kotlin
+*.class
+*.kotlin_module
+
+# NDK
+*.o
+*.so
+*.a
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+*.dex

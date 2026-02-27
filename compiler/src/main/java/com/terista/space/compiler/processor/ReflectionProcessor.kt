@@ -1,0 +1,209 @@
+package com.terista.space.compiler.processor
+
+import com.google.auto.service.AutoService
+import com.squareup.javapoet.*
+import com.terista.space.reflection.annotation.ReflectionClass
+import com.terista.space.reflection.annotation.ReflectionField
+import com.terista.space.reflection.annotation.ReflectionMethod
+import javax.annotation.processing.*
+import javax.lang.model.SourceVersion
+import javax.lang.model.element.*
+import javax.lang.model.type.TypeKind
+import javax.tools.Diagnostic
+
+/**
+ * Annotation processor that generates reflection stub classes (BR classes).
+ * This generates type-safe wrappers around Java reflection operations.
+ */
+@AutoService(Processor::class)
+@SupportedSourceVersion(SourceVersion.RELEASE_21)
+@SupportedAnnotationTypes(
+    "com.terista.space.reflection.annotation.ReflectionClass",
+    "com.terista.space.reflection.annotation.ReflectionMethod",
+    "com.terista.space.reflection.annotation.ReflectionField"
+)
+class ReflectionProcessor : AbstractProcessor() {
+
+    private lateinit var messager: Messager
+    private lateinit var filer: Filer
+
+    override fun init(processingEnv: ProcessingEnvironment) {
+        super.init(processingEnv)
+        messager = processingEnv.messager
+        filer = processingEnv.filer
+    }
+
+    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        val reflectionClasses = roundEnv.getElementsAnnotatedWith(ReflectionClass::class.java)
+
+        reflectionClasses.forEach { element ->
+            if (element.kind == ElementKind.CLASS) {
+                processReflectionClass(element as TypeElement)
+            }
+        }
+
+        return true
+    }
+
+    private fun processReflectionClass(element: TypeElement) {
+        val annotation = element.getAnnotation(ReflectionClass::class.java)
+        val targetClass = annotation.targetClass
+        val stubName = if (annotation.stubName.isNotEmpty()) {
+            annotation.stubName
+        } else {
+            "BR" + element.simpleName
+        }
+
+        messager.printMessage(Diagnostic.Kind.NOTE, "Processing $element -> $stubName")
+
+        try {
+            generateStubClass(stubName, targetClass, element, annotation)
+        } catch (e: Exception) {
+            messager.printMessage(Diagnostic.Kind.ERROR, "Failed to generate stub: ${e.message}")
+        }
+    }
+
+    private fun generateStubClass(
+        stubName: String,
+        targetClass: String,
+        element: TypeElement,
+        annotation: ReflectionClass
+    ) {
+        val packageName = processingEnv.elementUtils.getPackageOf(element).toString()
+
+        // Build the stub class
+        val classBuilder = TypeSpec.classBuilder(stubName)
+            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+            .addJavadoc("Generated reflection stub for $targetClass
+")
+
+        // Add target class field
+        val targetField = FieldSpec.builder(Class::class.java, "TARGET_CLASS")
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer("loadClass("$targetClass")")
+            .build()
+        classBuilder.addField(targetField)
+
+        // Add constructor
+        classBuilder.addMethod(
+            MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PRIVATE)
+                .addStatement("throw new AssertionError("No instances")")
+                .build()
+        )
+
+        // Add class loader method
+        classBuilder.addMethod(
+            MethodSpec.methodBuilder("loadClass")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .addParameter(String::class.java, "className")
+                .returns(Class::class.java)
+                .addException(ClassNotFoundException::class.java)
+                .addStatement("return Class.forName(className)")
+                .build()
+        )
+
+        // Process methods if enabled
+        if (annotation.generateMethods) {
+            val methods = element.enclosedElements.filter { it.kind == ElementKind.METHOD }
+            methods.forEach { methodElement ->
+                val methodAnnotation = methodElement.getAnnotation(ReflectionMethod::class.java)
+                if (methodAnnotation != null) {
+                    addReflectionMethod(classBuilder, methodElement as ExecutableElement, methodAnnotation)
+                }
+            }
+        }
+
+        // Process fields if enabled
+        if (annotation.generateFields) {
+            val fields = element.enclosedElements.filter { it.kind == ElementKind.FIELD }
+            fields.forEach { fieldElement ->
+                val fieldAnnotation = fieldElement.getAnnotation(ReflectionField::class.java)
+                if (fieldAnnotation != null) {
+                    addReflectionField(classBuilder, fieldElement as VariableElement, fieldAnnotation)
+                }
+            }
+        }
+
+        // Generate the file
+        val javaFile = JavaFile.builder(packageName, classBuilder.build())
+            .addFileComment("Generated by TeristaSpace Reflection Processor - DO NOT EDIT")
+            .build()
+
+        javaFile.writeTo(filer)
+    }
+
+    private fun addReflectionMethod(
+        classBuilder: TypeSpec.Builder,
+        method: ExecutableElement,
+        annotation: ReflectionMethod
+    ) {
+        val methodName = if (annotation.targetMethod.isNotEmpty()) {
+            annotation.targetMethod
+        } else {
+            method.simpleName.toString()
+        }
+
+        val methodBuilder = MethodSpec.methodBuilder(methodName)
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(Any::class.java)
+            .addParameter(Any::class.java, "target")
+            .addParameter(Array::class.java, "args")
+            .varargs()
+            .addException(Exception::class.java)
+            .addStatement("java.lang.reflect.Method method = TARGET_CLASS.getDeclaredMethod(\$S, getParameterTypes(args))", methodName)
+            .addStatement("method.setAccessible(true)")
+            .addStatement("return method.invoke(target, args)")
+
+        classBuilder.addMethod(methodBuilder.build())
+    }
+
+    private fun addReflectionField(
+        classBuilder: TypeSpec.Builder,
+        field: VariableElement,
+        annotation: ReflectionField
+    ) {
+        val fieldName = if (annotation.targetField.isNotEmpty()) {
+            annotation.targetField
+        } else {
+            field.simpleName.toString()
+        }
+
+        // Getter
+        val getterBuilder = MethodSpec.methodBuilder("get${fieldName.capitalize()}")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(Any::class.java)
+            .addParameter(Any::class.java, "target")
+            .addException(Exception::class.java)
+            .addStatement("java.lang.reflect.Field field = TARGET_CLASS.getDeclaredField(\$S)", fieldName)
+            .addStatement("field.setAccessible(true)")
+            .addStatement("return field.get(target)")
+
+        classBuilder.addMethod(getterBuilder.build())
+
+        // Setter
+        val setterBuilder = MethodSpec.methodBuilder("set${fieldName.capitalize()}")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID)
+            .addParameter(Any::class.java, "target")
+            .addParameter(Any::class.java, "value")
+            .addException(Exception::class.java)
+            .addStatement("java.lang.reflect.Field field = TARGET_CLASS.getDeclaredField(\$S)", fieldName)
+            .addStatement("field.setAccessible(true)")
+            .addStatement("field.set(target, value)")
+
+        classBuilder.addMethod(setterBuilder.build())
+    }
+
+    private fun getParameterTypes(args: Array<Any>): Array<Class<*>> {
+        return args.map { it::class.java }.toTypedArray()
+    }
+
+    private fun String.capitalize(): String {
+        return if (isNotEmpty()) {
+            Character.toUpperCase(this[0]) + substring(1)
+        } else {
+            this
+        }
+    }
+}

@@ -1,0 +1,32 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  JAVA_VERSION: '21'
+
+jobs:
+  pr-check:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        cache: gradle
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Run Lint
+      run: ./gradlew lintDebug --continue
+    - name: Run Unit Tests
+      run: ./gradlew testDebugUnitTest --continue
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --stacktrace

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TeristaSpace" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/terista_primary</item>
+        <item name="colorPrimaryVariant">@color/terista_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/terista_secondary</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/terista_background</item>
+        <item name="colorSurface">@color/terista_surface</item>
+        <item name="colorError">@color/terista_error</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/terista_primary_dark</item>
+        <item name="android:navigationBarColor">@color/terista_background</item>
+
+        <!-- Typography -->
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.TeristaSpace.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.TeristaSpace.HeadlineMedium</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.TeristaSpace.TitleLarge</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.TeristaSpace.BodyLarge</item>
+    </style>
+
+    <!-- Typography Styles -->
+    <style name="TextAppearance.TeristaSpace.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.TeristaSpace.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.TeristaSpace.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.TeristaSpace.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">sans-serif</item>
+    </style>
+</resources>

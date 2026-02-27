@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.terista.space.sandbox">
+
+    <!-- Isolated process requires no special permissions -->
+
+    <application>
+        <!-- Sandbox Service running in isolated process -->
+        <service
+            android:name=".SandboxService"
+            android:enabled="true"
+            android:exported="false"
+            android:isolatedProcess="true"
+            android:useAppZygote="true"
+            android:process=":sandbox" />
+    </application>
+
+</manifest>

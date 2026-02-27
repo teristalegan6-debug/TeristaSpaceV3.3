@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TeristaSpace</string>
+    <string name="app_description">Virtual Environment Manager</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_virtual_apps">Virtual Apps</string>
+    <string name="nav_work_profile">Work Profile</string>
+    <string name="nav_device_info">Device Info</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Actions -->
+    <string name="action_install">Install</string>
+    <string name="action_uninstall">Uninstall</string>
+    <string name="action_launch">Launch</string>
+    <string name="action_create">Create</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_back">Back</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+
+    <!-- Virtual Apps -->
+    <string name="virtual_apps_title">Virtual Applications</string>
+    <string name="virtual_apps_empty">No virtual apps installed</string>
+    <string name="install_app">Install App</string>
+    <string name="select_apk">Select APK file</string>
+
+    <!-- Work Profile -->
+    <string name="work_profile_title">Android Work Profile</string>
+    <string name="work_profile_active">Work Profile Active</string>
+    <string name="work_profile_inactive">No Work Profile</string>
+    <string name="create_work_profile">Create Work Profile</string>
+    <string name="remove_work_profile">Remove Work Profile</string>
+    <string name="manage_work_profile">Manage Work Profile</string>
+
+    <!-- Device Info -->
+    <string name="device_info_title">Device Information</string>
+    <string name="system_info">System Information</string>
+    <string name="virtualization_status">Virtualization Status</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="virtualization_settings">Virtualization Settings</string>
+    <string name="hardware_acceleration">Hardware Acceleration</string>
+    <string name="auto_start_apps">Auto-start Virtual Apps</string>
+    <string name="isolate_file_system">Isolate File System</string>
+    <string name="debug_mode">Debug Mode</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="version">Version 1.0.0</string>
+    <string name="about_description">A legitimate Android virtualization framework using official APIs.</string>
+
+    <!-- Errors -->
+    <string name="error_generic">An error occurred</string>
+    <string name="error_permission_denied">Permission denied</string>
+    <string name="error_not_supported">Feature not supported on this device</string>
+</resources>
