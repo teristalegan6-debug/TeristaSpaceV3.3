@@ -5,11 +5,18 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS) // or PREFER_SETTINGS
     repositories {
         google()
         mavenCentral()
+        
+        // ADD THESE IF NEEDED for your modules:
+        maven { url 'https://jitpack.io' }  // Common for GitHub libraries
+        
+        // Only if you need snapshot versions:
+        // maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 }
 
