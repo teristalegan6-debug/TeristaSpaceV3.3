@@ -82,7 +82,7 @@ auto-service-annotations = { group = "com.google.auto.service", name = "auto-ser
 # Testing
 junit = { group = "junit", name = "junit", version = "4.13.2" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version = "1.2.1" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.6.1" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.7.0" }
 
 [bundles]
 compose = ["compose-ui", "compose-graphics", "compose-tooling-preview", "compose-material3", "compose-material-icons"]
