@@ -76,7 +76,7 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
     - name: Install Build Tools
       run: |
         sdkmanager "build-tools;${{ env.ANDROID_BUILD_TOOLS_VERSION }}"
@@ -108,7 +108,7 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
     - name: Install Build Tools
       run: |
         sdkmanager "build-tools;${{ env.ANDROID_BUILD_TOOLS_VERSION }}"
